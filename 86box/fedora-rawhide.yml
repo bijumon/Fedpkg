@@ -1,0 +1,17 @@
+services:
+  86Box-rawhide:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: fedora-rawhide
+    container_name: 86box-rawhide
+    tty: true
+    stdin_open: true
+    working_dir: /work
+    volumes:
+      - ./86Box.git:/work/86Box.git:rw
+    environment:
+      - CMAKE_BUILD_PARALLEL_LEVEL=16
+      - MAKEFLAGS=-j16
+    command: /bin/bash
+
