@@ -1,0 +1,23 @@
+FROM fedora:rawhide
+
+RUN dnf -y install git cmake gcc-c++ make \
+    sdl2-compat-devel SDL2_mixer-devel libpng \
+    && dnf clean all
+
+WORKDIR /build
+
+# Build script kept inside image for reproducibility
+RUN cat <<'EOF' > augustus-build.sh
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd /src/augustus
+git config --global --add safe.directory /src/augustus
+git checkout master
+
+cmake -S . -B /build/augustus -DCMAKE_BUILD_TYPE=Release
+cmake --build /build/augustus --parallel $(nproc)
+cmake --install /build/augustus --prefix /dist/augustus
+EOF
+
+RUN chmod +x augustus-build.sh

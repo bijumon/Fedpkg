@@ -1,0 +1,25 @@
+FROM fedora:rawhide
+
+RUN dnf -y install git cmake gcc-c++ make \
+    libstdc++-devel libstdc++-static \
+    sdl2-compat-devel SDL2_mixer-devel libpng \
+    zlib-devel zlib-static freetype-devel harfbuzz-devel \
+    && dnf clean all
+
+WORKDIR /build
+
+# Build script kept inside image for reproducibility
+    RUN cat <<'EOF' > akhenaten-build.sh
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd /src/akhenaten
+git config --global --add safe.directory /src/akhenaten
+git checkout master
+
+cmake -S . -B /build/akhenaten -DCMAKE_BUILD_TYPE=Release
+cmake --build /build/akhenaten --parallel $(nproc)
+cmake --install /build/akhenaten --prefix /dist/akhenaten
+EOF
+
+RUN chmod +x akhenaten-build.sh

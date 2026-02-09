@@ -1,0 +1,23 @@
+FROM fedora:rawhide
+
+RUN dnf -y install git cmake gcc-c++ make \
+    sdl2-compat-devel SDL2_mixer-devel libpng \
+    && dnf clean all
+
+WORKDIR /build
+
+# Build script kept inside image for reproducibility
+RUN cat <<'EOF' > julius-build.sh
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd /src/julius
+git config --global --add safe.directory /src/julius
+git checkout master
+
+cmake -S . -B /build/julius -DCMAKE_BUILD_TYPE=Release
+cmake --build /build/julius --parallel $(nproc)
+cmake --install /build/julius --prefix /dist/julius
+EOF
+
+RUN chmod +x julius-build.sh

@@ -1,0 +1,33 @@
+services:
+  julius:
+    image: fedora-rawhide
+    build:
+      context: .
+      dockerfile: Dockerfile.julius
+    volumes:
+      - ~/SOURCES/julius/:/src/julius
+      - ./dist/julius:/dist/julius
+    working_dir: /build/julius
+    command: /build/julius-build.sh
+
+  augustus:
+    image: fedora-rawhide
+    build:
+      context: .
+      dockerfile: Dockerfile.augustus
+    volumes:
+      - ~/SOURCES/augustus:/src/augustus
+      - ./dist/augustus:/dist/augustus
+    working_dir: /build/augustus
+    command: /build/augustus-build.sh
+
+  akhenaten:
+    image: fedora-rawhide
+    build:
+      context: .
+      dockerfile: Dockerfile.akhenaten
+    volumes:
+      - ~/SOURCES/Akhenaten:/src/akhenaten
+      - ./dist/akhenaten:/dist/akhenaten
+    working_dir: /build/akhenaten
+    command: /build/akhenaten-build.sh
