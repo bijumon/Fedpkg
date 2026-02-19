@@ -1,0 +1,70 @@
+%global forgeurl https://github.com/dalerank/Akhenaten
+%global date     %(date +%%Y%%m%%d)
+%global commit   69c7f7bbf4d045e3a7e9ee07ecf5f7a0b22344b3
+%global shortcommit %(c=%{commit}; echo ${c:0:7})
+
+Name:           akhenaten
+Version:        0.26
+Release:        %{date}git%{shortcommit}%{?dist}
+Summary:        An open source re-implementation of Pharaoh + Cleopatra
+License:        AGPLv3+
+URL:            %{forgeurl}
+
+Source0:        %{forgeurl}/archive/%{commit}/%{name}-%{shortcommit}.tar.gz
+
+BuildRequires:  git
+BuildRequires:  gcc-c++
+BuildRequires:  make
+BuildRequires:  cmake
+BuildRequires:  libstdc++-devel
+BuildRequires:  libstdc++-static
+BuildRequires:  sdl2-compat-devel
+BuildRequires:  SDL2_mixer-devel
+BuildRequires:  libpng-devel
+BuildRequires:  zlib-devel
+BuildRequires:  zlib-static
+BuildRequires:  freetype-devel
+BuildRequires:  harfbuzz-devel
+BuildRequires:  pkgconfig
+
+Requires:       SDL2
+Requires:       SDL2_mixer
+Requires:       hicolor-icon-theme
+
+%description
+Akhenaten is a fully playable open source re-implementation of Pharaoh and its expansion, Cleopatra
+Note: You need the original Caesar assets to play.
+
+%prep
+%autosetup -n %{name}-%{commit} -c -p1
+if [ -d */ ]; then
+    mv */* .
+    rmdir */ 2>/dev/null || :
+fi
+
+%build
+%cmake . \
+  -DOPTION_ENABLE_TRACY=OFF \
+  -DTRACY_ENABLE=OFF \
+  -DUSE_SYSTEM_ZLIB=ON \
+  -DUSE_SYSTEM_SDL2=ON \
+  -DUSE_SYSTEM_SDL2_MIXER=ON \
+  -DUSE_SYSTEM_FREETYPE=ON \
+  -DUSE_SYSTEM_HARFBUZZ=ON \
+  -DCMAKE_BUILD_TYPE=Release
+%cmake_build
+
+%install
+%cmake_install
+
+%files
+%license LICENSE.txt
+%doc README.md
+%{_bindir}/%{name}
+%{_datadir}/applications/*.desktop
+%{_datadir}/icons/hicolor/*/apps/*.png
+%{_datadir}/metainfo/*.xml
+
+%changelog
+* %(date "+%a %b %d %Y") User <user@example.com> - %{version}-%{release}
+- Fixed unpackaged assets error
